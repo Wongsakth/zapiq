@@ -168,18 +168,24 @@ export default function HomeScreen() {
           ▶ Play
         </button>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
+          <button
+            onClick={() => navigateTo('leaderboard')}
+            className="py-4 rounded-2xl font-semibold text-[#6B6878] bg-white border border-[#E8E4F0] active:scale-95 transition-transform"
+          >
+            🏆<br /><span className="text-xs">Rank</span>
+          </button>
           <button
             onClick={() => navigateTo('passplay-setup')}
             className="py-4 rounded-2xl font-semibold text-[#6B6878] bg-white border border-[#E8E4F0] active:scale-95 transition-transform"
           >
-            👥 Pass & Play
+            👥<br /><span className="text-xs">Pass & Play</span>
           </button>
           <button
             onClick={() => navigateTo('settings')}
             className="py-4 rounded-2xl font-semibold text-[#6B6878] bg-white border border-[#E8E4F0] active:scale-95 transition-transform"
           >
-            ⚙️ Settings
+            ⚙️<br /><span className="text-xs">Settings</span>
           </button>
         </div>
       </div>

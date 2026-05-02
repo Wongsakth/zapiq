@@ -11,6 +11,7 @@ import PassPlayGameScreen from './screens/PassPlayGameScreen'
 import PassPlayHandoffScreen from './screens/PassPlayHandoffScreen'
 import PassPlayResultsScreen from './screens/PassPlayResultsScreen'
 import SettingsScreen from './screens/SettingsScreen'
+import LeaderboardScreen from './screens/LeaderboardScreen'
 import { parseChallengeFromUrl, clearChallengeFromUrl } from './utils/challengeUtils'
 import Header from './components/ui/Header'
 
@@ -52,6 +53,7 @@ export default function App() {
       case 'passplay-results':return <PassPlayResultsScreen />
       case 'challenge':       return <ChallengeScreen />
       case 'settings':        return <SettingsScreen />
+      case 'leaderboard':     return <LeaderboardScreen />
       default:                return <HomeScreen />
     }
   }

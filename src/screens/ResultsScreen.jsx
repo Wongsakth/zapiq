@@ -9,6 +9,7 @@ import { buildChallengeUrl } from '../utils/challengeUtils'
 import { getBrainAgeLabel, getBrainAgeColor, getZapiqLabel, getZapiqColor } from '../utils/brainAnalysis'
 import { getPrestigeBonus, getPrestigeBonusLabel } from '../utils/prestigeUtils'
 import { playSound } from '../utils/soundPlayer'
+import { saveScore } from '../services/leaderboard'
 
 // ── Gradient map for html2canvas (needs inline styles, not Tailwind classes) ──
 const CROWN_GRADIENT = {
@@ -410,7 +411,9 @@ export default function ResultsScreen() {
   const [showCelebration, setShowCelebration] = useState(false)
   const [showPrestige, setShowPrestige]       = useState(false)
   const [challengeUrlState, setChallengeUrlState] = useState(null) // null | { url, copied }
+  const [savedToast, setSavedToast]           = useState(false)
   const celebTimerRef = useRef(null)
+  const savedRef      = useRef(false)
 
   const isCelebrating    = levelUpTriggered || bossUnlockTriggered
   const celebrationLevel = bossUnlockTriggered ? 'obsidian' : crownLevel
@@ -423,6 +426,26 @@ export default function ResultsScreen() {
     }, 1500)
     return () => clearTimeout(celebTimerRef.current)
   }, [isCelebrating, bossUnlockTriggered])
+
+  // Auto-save to leaderboard after every combo game
+  useEffect(() => {
+    if (savedRef.current) return
+    if (lastGameMode !== 'combo' && lastGameMode !== 'boss') return
+    const zs = brainAnalysis?.zapiqScore
+    if (!zs) return
+    savedRef.current = true
+    saveScore(
+      playerName,
+      crownLevel,
+      zs,
+      brainAnalysis?.brainAge ?? null,
+      obsidianCount,
+      prestigeLevel,
+    ).then(() => {
+      setSavedToast(true)
+      setTimeout(() => setSavedToast(false), 2500)
+    }).catch(() => {})
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDismissCelebration = () => {
     setShowCelebration(false)
@@ -671,6 +694,13 @@ export default function ResultsScreen() {
           Back to Home
         </button>
       </div>
+
+      {/* Leaderboard saved toast */}
+      {savedToast && (
+        <div className="mx-4 mb-2 px-4 py-2 rounded-xl bg-[#A8D5A2]/30 border border-[#A8D5A2] text-center">
+          <p className="text-[#1A4D1A] text-xs font-semibold">บันทึกคะแนนแล้ว ✓</p>
+        </div>
+      )}
 
       {/* Disclaimer */}
       <div className="px-6 pb-5 text-center">

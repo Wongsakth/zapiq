@@ -14,6 +14,8 @@ import SettingsScreen from './screens/SettingsScreen'
 import LeaderboardScreen from './screens/LeaderboardScreen'
 import { parseChallengeFromUrl, clearChallengeFromUrl } from './utils/challengeUtils'
 import Header from './components/ui/Header'
+import { db } from './firebase'
+import { doc, setDoc } from 'firebase/firestore'
 
 function Screen({ children }) {
   return (
@@ -35,6 +37,12 @@ export default function App() {
       clearChallengeFromUrl()
       setChallenge(data)
     }
+
+    // Firebase connection test
+    console.log('[Firebase] running connection test...')
+    setDoc(doc(db, 'test', 'connection'), { hello: 'world', timestamp: new Date() })
+      .then(() => console.log('[Firebase] connection test SUCCESS ✓'))
+      .catch(e => console.error('[Firebase] connection test FAILED', e))
   }, [])
 
   // Redirect to onboarding if not complete

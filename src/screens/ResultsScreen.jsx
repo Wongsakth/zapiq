@@ -9,7 +9,6 @@ import { buildChallengeUrl } from '../utils/challengeUtils'
 import { getBrainAgeLabel, getBrainAgeColor, getZapiqLabel, getZapiqColor } from '../utils/brainAnalysis'
 import { getPrestigeBonus, getPrestigeBonusLabel } from '../utils/prestigeUtils'
 import { playSound } from '../utils/soundPlayer'
-import { saveScore } from '../services/leaderboard'
 
 // ── Gradient map for html2canvas (needs inline styles, not Tailwind classes) ──
 const CROWN_GRADIENT = {
@@ -426,23 +425,60 @@ export default function ResultsScreen() {
     return () => clearTimeout(celebTimerRef.current)
   }, [isCelebrating, bossUnlockTriggered])
 
+  const zapiqScore  = brainAnalysis?.zapiqScore ?? 0
+  const brainAge    = brainAnalysis?.brainAge   ?? null
+  const tapScore    = sessionScores[0] || 0
+  const mathScore   = sessionScores[1] || 0
+  const memoryScore = sessionScores[2] || 0
+
   // Auto-save to leaderboard after every combo game
-  const zapiqScore = brainAnalysis?.zapiqScore ?? 0
-  const brainAge   = brainAnalysis?.brainAge   ?? null
   useEffect(() => {
-    const save = async () => {
+    const saveToFirebase = async () => {
       try {
-        console.log('[ZAPIQ] Attempting Firebase save...', playerName, zapiqScore)
-        await saveScore(playerName, highScores, zapiqScore, brainAge, obsidianCount, crownLevel)
-        console.log('[ZAPIQ] Firebase save SUCCESS')
-        setSavedToast(true)
-        setTimeout(() => setSavedToast(false), 2500)
+        const { db }               = await import('../firebase')
+        const { doc, setDoc, getDoc } = await import('firebase/firestore')
+
+        const silverBest   = highScores?.silver?.combo  || 0
+        const goldBest     = highScores?.gold?.combo    || 0
+        const diamondBest  = highScores?.diamond?.combo || 0
+        const prestigeScore = silverBest + goldBest + diamondBest + ((obsidianCount || 0) * 2)
+
+        const playerData = {
+          playerName:    playerName || 'Anonymous',
+          zapiqScore:    zapiqScore  || 0,
+          brainAge:      brainAge    || 0,
+          crownLevel:    crownLevel  || 'silver',
+          obsidianCount: obsidianCount || 0,
+          tapScore,
+          mathScore,
+          memoryScore,
+          silverBest,
+          goldBest,
+          diamondBest,
+          prestigeScore,
+          updatedAt: new Date().toISOString(),
+        }
+
+        console.log('[FIREBASE] Saving player data:', playerData)
+
+        const playerRef = doc(db, 'leaderboard', playerName || 'Anonymous')
+        const existing  = await getDoc(playerRef)
+
+        if (!existing.exists() || (existing.data().prestigeScore || 0) < prestigeScore) {
+          await setDoc(playerRef, playerData)
+          console.log('[FIREBASE] Score saved successfully!')
+          setSavedToast(true)
+          setTimeout(() => setSavedToast(false), 2500)
+        } else {
+          console.log('[FIREBASE] Existing score is higher, not updating')
+        }
       } catch (err) {
-        console.error('[ZAPIQ] Firebase save ERROR:', err)
+        console.error('[FIREBASE] Save error:', err.code, err.message)
       }
     }
-    if (zapiqScore > 0) save()
-    else console.log('[ZAPIQ] skipping save: zapiqScore is', zapiqScore, 'gameMode:', lastGameMode)
+
+    if (zapiqScore > 0 && playerName) saveToFirebase()
+    else console.log('[FIREBASE] skipping save — zapiqScore:', zapiqScore, 'playerName:', playerName)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDismissCelebration = () => {

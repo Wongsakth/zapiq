@@ -189,37 +189,6 @@ export default function HomeScreen() {
           </button>
         </div>
 
-        <div style={{ textAlign: 'center', padding: '4px 0 0' }}>
-          <button
-            style={{ fontSize: 12, color: '#999', background: '#f0f0f0', border: '1px solid #ddd', borderRadius: 8, padding: '4px 12px', cursor: 'pointer' }}
-            onClick={async () => {
-              try {
-                console.log('[FIREBASE TEST] Starting test write...')
-                const { db } = await import('../firebase')
-                const { collection, addDoc } = await import('firebase/firestore')
-                const testData = {
-                  playerName: 'TestPlayer',
-                  zapiqScore: 999,
-                  brainAge: 20,
-                  crownLevel: 'gold',
-                  obsidianCount: 0,
-                  timestamp: new Date().toISOString(),
-                  test: true,
-                }
-                console.log('[FIREBASE TEST] Writing:', testData)
-                const ref = await addDoc(collection(db, 'leaderboard'), testData)
-                console.log('[FIREBASE TEST] SUCCESS! Doc ID:', ref.id)
-                alert('✅ Firebase ใช้งานได้! Doc ID: ' + ref.id)
-              } catch (err) {
-                console.error('[FIREBASE TEST] FAILED:', err.code, err.message)
-                alert('❌ Firebase Error: ' + err.code + ' - ' + err.message)
-              }
-            }}
-          >
-            🔥 Test Firebase
-          </button>
-        </div>
-
         <div style={{ textAlign: 'center', padding: '4px 0', fontSize: '10px', color: '#ccc' }}>
           Build: {new Date(__BUILD_TIME__).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
         </div>

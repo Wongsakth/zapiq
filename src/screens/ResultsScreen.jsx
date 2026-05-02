@@ -9,6 +9,7 @@ import { buildChallengeUrl } from '../utils/challengeUtils'
 import { getBrainAgeLabel, getBrainAgeColor, getZapiqLabel, getZapiqColor } from '../utils/brainAnalysis'
 import { getPrestigeBonus, getPrestigeBonusLabel } from '../utils/prestigeUtils'
 import { playSound } from '../utils/soundPlayer'
+import { saveUser } from '../utils/userStorage'
 
 // ── Gradient map for html2canvas (needs inline styles, not Tailwind classes) ──
 const CROWN_GRADIENT = {
@@ -472,6 +473,7 @@ export default function ResultsScreen() {
         } else {
           console.log('[FIREBASE] Existing score is higher, not updating')
         }
+        saveUser(playerName, crownLevel, obsidianCount)
       } catch (err) {
         console.error('[FIREBASE] Save error:', err.code, err.message)
       }

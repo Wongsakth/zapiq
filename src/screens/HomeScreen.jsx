@@ -69,6 +69,16 @@ export default function HomeScreen() {
         </div>
       </div>
 
+      {/* Slogan */}
+      <div style={{ textAlign: 'center', paddingTop: 6, paddingBottom: 2 }}>
+        <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--color-text-primary)', margin: '0 0 4px' }}>
+          3 Games. 1 Champion.
+        </p>
+        <p style={{ fontSize: 13, fontWeight: 400, color: 'var(--color-text-secondary)', margin: 0 }}>
+          Think fast. Tap faster.
+        </p>
+      </div>
+
       {/* Crown section */}
       <div className="flex flex-col items-center py-6 gap-3">
         <div className="animate-float relative">

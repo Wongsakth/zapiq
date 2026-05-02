@@ -42,14 +42,14 @@ export default function Header() {
         position: 'absolute',
         left: '50%',
         transform: 'translateX(-50%)',
-        fontFamily: "'Syne', sans-serif",
-        fontWeight: 800,
-        fontSize: 20,
-        letterSpacing: '0.04em',
+        background: '#E8F4F0',
+        border: '1.5px solid #A8D8CC',
+        borderRadius: 16,
+        padding: '4px 20px',
         userSelect: 'none',
       }}>
-        <span style={{ color: 'var(--color-text-primary)' }}>ZAP</span>
-        <span style={{ color: 'var(--color-accent-red)' }}>IQ</span>
+        <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 20, letterSpacing: '0.04em', color: 'var(--color-text-primary)' }}>ZAP</span>
+        <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 20, letterSpacing: '0.04em', color: 'var(--color-accent-red)' }}>IQ</span>
       </div>
 
       {/* Right: crown icon only */}

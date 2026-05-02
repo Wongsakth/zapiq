@@ -190,6 +190,9 @@ export default function HomeScreen() {
         </div>
       </div>
 
+      <p className="text-center pb-3" style={{ fontSize: 10, color: '#C8C4D4' }}>
+        Build: {new Date(__BUILD_TIME__).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+      </p>
     </div>
   )
 }

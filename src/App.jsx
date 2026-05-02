@@ -15,7 +15,7 @@ import LeaderboardScreen from './screens/LeaderboardScreen'
 import { parseChallengeFromUrl, clearChallengeFromUrl } from './utils/challengeUtils'
 import Header from './components/ui/Header'
 import { db } from './firebase'
-import { doc, setDoc } from 'firebase/firestore'
+import { collection, addDoc } from 'firebase/firestore'
 
 function Screen({ children }) {
   return (
@@ -39,10 +39,19 @@ export default function App() {
     }
 
     // Firebase connection test
-    console.log('[Firebase] running connection test...')
-    setDoc(doc(db, 'test', 'connection'), { hello: 'world', timestamp: new Date() })
-      .then(() => console.log('[Firebase] connection test SUCCESS ✓'))
-      .catch(e => console.error('[Firebase] connection test FAILED', e))
+    const test = async () => {
+      try {
+        console.log('[FIREBASE TEST] Starting...')
+        const docRef = await addDoc(collection(db, 'test'), {
+          hello: 'world',
+          time: new Date().toISOString(),
+        })
+        console.log('[FIREBASE TEST] SUCCESS - doc id:', docRef.id)
+      } catch (e) {
+        console.error('[FIREBASE TEST] FAILED:', e.message, e.code)
+      }
+    }
+    test()
   }, [])
 
   // Redirect to onboarding if not complete

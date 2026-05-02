@@ -84,7 +84,7 @@ export default function MemoryCardGame({ crownLevel, onFinish, isDemo = false, t
       mismatchRef.current += 1
       if (config.wrongPenalty < 0) setScore(s => Math.max(0, s - 1))
       playSound('buzz')
-      lockTimer.current = setTimeout(() => { setFlipped([]); setLocked(false) }, 900)
+      lockTimer.current = setTimeout(() => { setFlipped([]); setLocked(false) }, 400)
     }
   }, [locked, expired, matched, flipped, deck, pairsFound, score, isDemo, config, onFinish])
 

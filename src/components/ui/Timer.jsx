@@ -23,7 +23,7 @@ export default function Timer({ duration, onExpire, paused = false, className = 
   useEffect(() => {
     if (timeLeft <= 0 && !firedRef.current) {
       firedRef.current = true
-      onExpireRef.current?.()
+      setTimeout(() => onExpireRef.current?.(), 500)
     }
   }, [timeLeft])
 

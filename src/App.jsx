@@ -1,5 +1,6 @@
 import { db } from './firebase'
 import { collection, addDoc } from 'firebase/firestore'
+import { cleanupTestDocs } from './services/leaderboard'
 import React, { useEffect } from 'react'
 import useGameStore from './store/gameStore'
 import OnboardingScreen from './screens/OnboardingScreen'
@@ -28,7 +29,7 @@ function Screen({ children }) {
 export default function App() {
   const { screen, onboardingComplete, setChallenge } = useGameStore()
 
-  // Firebase connection test — FIRST effect
+  // Firebase connection test + cleanup test docs
   useEffect(() => {
     const firebaseTest = async () => {
       console.log('[FIREBASE] db object:', db)
@@ -43,13 +44,11 @@ export default function App() {
       }
     }
     firebaseTest()
+    cleanupTestDocs().catch(() => {})
   }, [])
 
   useEffect(() => {
-    console.log('[ZAPIQ] href:', window.location.href)
-    console.log('[ZAPIQ] search:', window.location.search)
     const data = parseChallengeFromUrl()
-    console.log('[ZAPIQ] challenge data:', data)
     if (data) {
       clearChallengeFromUrl()
       setChallenge(data)

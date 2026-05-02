@@ -433,7 +433,7 @@ export default function ResultsScreen() {
     const save = async () => {
       try {
         console.log('[ZAPIQ] Attempting Firebase save...', playerName, zapiqScore)
-        await saveScore(playerName, crownLevel, zapiqScore, brainAge, obsidianCount, prestigeLevel)
+        await saveScore(playerName, highScores, zapiqScore, brainAge, obsidianCount, crownLevel)
         console.log('[ZAPIQ] Firebase save SUCCESS')
         setSavedToast(true)
         setTimeout(() => setSavedToast(false), 2500)

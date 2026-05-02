@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react'
 import useGameStore from '../store/gameStore'
 import Crown from '../components/ui/Crown'
 import { getLeaderboard } from '../services/leaderboard'
-import { getBrainAgeColor } from '../utils/brainAnalysis'
 
 const RANK_COLORS = {
   1: { num: '#B8860B', bg: '#FFFBEF', border: '#EDD890' },
@@ -14,10 +13,8 @@ function RankBadge({ rank }) {
   const style = RANK_COLORS[rank]
   if (style) {
     return (
-      <div
-        className="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-sm flex-shrink-0"
-        style={{ background: style.bg, border: `2px solid ${style.border}`, color: style.num }}
-      >
+      <div className="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-sm flex-shrink-0"
+           style={{ background: style.bg, border: `2px solid ${style.border}`, color: style.num }}>
         {rank}
       </div>
     )
@@ -30,52 +27,77 @@ function RankBadge({ rank }) {
 }
 
 function PlayerRow({ rank, entry, isMe }) {
-  const bc = entry.brainAge ? getBrainAgeColor(entry.brainAge) : null
+  const [expanded, setExpanded] = useState(false)
+
+  const obsidianPts = (entry.obsidianCount || 0) * 2
+  const hasBests    = (entry.silverBest || entry.goldBest || entry.diamondBest || entry.obsidianCount)
 
   return (
-    <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all ${
-        isMe
-          ? 'bg-[#F0EDF8] border-[#C8B8F0] shadow-sm'
-          : 'bg-white border-[#E8E4F0]'
-      }`}
-    >
-      <RankBadge rank={rank} />
+    <div className={`rounded-2xl border overflow-hidden transition-all ${
+      isMe ? 'bg-[#F0EDF8] border-[#C8B8F0] shadow-sm' : 'bg-white border-[#E8E4F0]'
+    }`}>
+      {/* Main row */}
+      <button
+        className="w-full flex items-center gap-3 px-4 py-3 active:opacity-70 transition-opacity"
+        onClick={() => hasBests && setExpanded(e => !e)}
+      >
+        <RankBadge rank={rank} />
 
-      <Crown level={entry.crownLevel || 'silver'} size={28} animated={false} />
+        <Crown level={entry.crownLevel || 'silver'} size={28} animated={false} />
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <p className={`font-bold truncate text-sm ${isMe ? 'text-[#6B4EFF]' : 'text-[#2C2C2A]'}`}>
-            {entry.playerName}
-            {isMe && <span className="text-[#6B4EFF] text-xs ml-1">(คุณ)</span>}
-          </p>
-          {entry.obsidianCount > 0 && (
-            <span className="text-purple-500 text-xs font-bold flex-shrink-0">👑×{entry.obsidianCount}</span>
+        <div className="flex-1 min-w-0 text-left">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <p className={`font-bold text-sm truncate ${isMe ? 'text-[#6B4EFF]' : 'text-[#2C2C2A]'}`}>
+              {entry.playerName}
+              {isMe && <span className="text-[#6B4EFF] text-xs ml-1">(คุณ)</span>}
+            </p>
+            {(entry.obsidianCount || 0) > 0 && (
+              <span className="text-xs font-bold text-[#1A0A3A] bg-[#E8D8FF] px-1.5 py-0.5 rounded-full flex-shrink-0">
+                👑×{entry.obsidianCount}
+              </span>
+            )}
+          </div>
+          {hasBests && (
+            <p className="text-[#9D9AA8] text-xs mt-0.5">{expanded ? '▲ ซ่อน' : '▼ ดูรายละเอียด'}</p>
           )}
         </div>
-        {entry.brainAge && bc && (
-          <p className="text-xs" style={{ color: bc.text }}>
-            Brain Age {entry.brainAge} ปี
-          </p>
-        )}
-      </div>
 
-      <div className="text-right flex-shrink-0">
-        <p className={`font-extrabold tabular-nums text-lg leading-none ${isMe ? 'text-[#6B4EFF]' : 'text-[#2C2C2A]'}`}>
-          {entry.zapiqScore}
-        </p>
-        <p className="text-[#9D9AA8] text-xs">ZAPIQ</p>
-      </div>
+        <div className="text-right flex-shrink-0">
+          <p className={`font-extrabold tabular-nums text-xl leading-none ${isMe ? 'text-[#6B4EFF]' : 'text-[#2C2C2A]'}`}>
+            {entry.prestigeScore ?? 0}
+          </p>
+          <p className="text-[#9D9AA8] text-xs">คะแนนรวม</p>
+        </div>
+      </button>
+
+      {/* Expandable detail */}
+      {expanded && hasBests && (
+        <div className="px-4 pb-3 pt-0 flex flex-wrap gap-x-4 gap-y-1 border-t border-[#E8E4F0]" style={{ paddingTop: 8 }}>
+          <span className="text-xs text-[#6B6878]">
+            🤍 Silver: <strong>{entry.silverBest || 0}pt</strong>
+          </span>
+          <span className="text-xs text-[#6B6878]">
+            💛 Gold: <strong>{entry.goldBest || 0}pt</strong>
+          </span>
+          <span className="text-xs text-[#6B6878]">
+            💎 Diamond: <strong>{entry.diamondBest || 0}pt</strong>
+          </span>
+          {(entry.obsidianCount || 0) > 0 && (
+            <span className="text-xs text-[#6B6878]">
+              👑 ×{entry.obsidianCount} <strong>(+{obsidianPts}pt)</strong>
+            </span>
+          )}
+        </div>
+      )}
     </div>
   )
 }
 
 export default function LeaderboardScreen() {
   const { playerName, navigateTo } = useGameStore()
-  const [entries, setEntries]     = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [error, setError]         = useState(null)
+  const [entries, setEntries]      = useState([])
+  const [loading, setLoading]      = useState(true)
+  const [error, setError]          = useState(null)
   const [lastRefresh, setLastRefresh] = useState(null)
 
   const fetchData = useCallback(async () => {
@@ -85,7 +107,7 @@ export default function LeaderboardScreen() {
       const data = await getLeaderboard(20)
       setEntries(data)
       setLastRefresh(new Date())
-    } catch (e) {
+    } catch {
       setError('โหลดข้อมูลไม่ได้ ลองใหม่อีกครั้ง')
     } finally {
       setLoading(false)
@@ -127,12 +149,12 @@ export default function LeaderboardScreen() {
         </button>
       </div>
 
-      {/* Your rank badge */}
+      {/* Your rank */}
       {myRank > 0 && (
         <div className="mx-4 mt-3 px-4 py-2.5 rounded-2xl bg-[#F0EDF8] border border-[#C8B8F0] flex items-center gap-2">
           <span className="text-[#6B4EFF] font-bold text-sm">อันดับของคุณ:</span>
           <span className="text-[#6B4EFF] font-extrabold text-lg">#{myRank}</span>
-          <span className="text-[#9D9AA8] text-xs ml-auto">จาก {entries.length} คน</span>
+          <span className="text-[#9D9AA8] text-xs ml-auto">คะแนนรวม = silver + gold + diamond + (👑×2)</span>
         </div>
       )}
 

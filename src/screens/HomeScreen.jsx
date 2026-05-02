@@ -160,7 +160,7 @@ export default function HomeScreen() {
       </div>
 
       {/* Play buttons */}
-      <div className="flex-1 flex flex-col justify-end p-4 gap-3 pb-6">
+      <div className="flex-1 flex flex-col justify-end p-4 gap-3 pb-2">
         <button
           onClick={() => navigateTo('mode-select')}
           className="w-full py-5 rounded-2xl font-bold text-xl text-[#1A4D1A] bg-[#A8D5A2] active:scale-95 transition-transform duration-150 shadow-sm"
@@ -188,11 +188,11 @@ export default function HomeScreen() {
             ⚙️<br /><span className="text-xs">Settings</span>
           </button>
         </div>
-      </div>
 
-      <p className="text-center pb-3" style={{ fontSize: 10, color: '#C8C4D4' }}>
-        Build: {new Date(__BUILD_TIME__).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-      </p>
+        <div style={{ textAlign: 'center', padding: '8px 0 4px', fontSize: '10px', color: '#ccc' }}>
+          Build: {new Date(__BUILD_TIME__).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+        </div>
+      </div>
     </div>
   )
 }

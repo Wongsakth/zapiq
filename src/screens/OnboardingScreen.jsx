@@ -41,6 +41,11 @@ function WelcomeStep({ name, onNameChange, onNext }) {
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-8 gap-6 animate-fade-in">
+      {/* Large animated gold crown */}
+      <div className="animate-float">
+        <Crown level="gold" size={120} animated />
+      </div>
+
       {/* Logo in pastel frame */}
       <div style={{
         display: 'inline-block',

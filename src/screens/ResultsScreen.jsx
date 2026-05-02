@@ -413,7 +413,6 @@ export default function ResultsScreen() {
   const [challengeUrlState, setChallengeUrlState] = useState(null) // null | { url, copied }
   const [savedToast, setSavedToast]           = useState(false)
   const celebTimerRef = useRef(null)
-  const savedRef      = useRef(false)
 
   const isCelebrating    = levelUpTriggered || bossUnlockTriggered
   const celebrationLevel = bossUnlockTriggered ? 'obsidian' : crownLevel
@@ -428,23 +427,22 @@ export default function ResultsScreen() {
   }, [isCelebrating, bossUnlockTriggered])
 
   // Auto-save to leaderboard after every combo game
+  const zapiqScore = brainAnalysis?.zapiqScore ?? 0
+  const brainAge   = brainAnalysis?.brainAge   ?? null
   useEffect(() => {
-    if (savedRef.current) return
-    if (lastGameMode !== 'combo' && lastGameMode !== 'boss') return
-    const zs = brainAnalysis?.zapiqScore
-    if (!zs) return
-    savedRef.current = true
-    saveScore(
-      playerName,
-      crownLevel,
-      zs,
-      brainAnalysis?.brainAge ?? null,
-      obsidianCount,
-      prestigeLevel,
-    ).then(() => {
-      setSavedToast(true)
-      setTimeout(() => setSavedToast(false), 2500)
-    }).catch(() => {})
+    const save = async () => {
+      try {
+        console.log('[ZAPIQ] Attempting Firebase save...', playerName, zapiqScore)
+        await saveScore(playerName, crownLevel, zapiqScore, brainAge, obsidianCount, prestigeLevel)
+        console.log('[ZAPIQ] Firebase save SUCCESS')
+        setSavedToast(true)
+        setTimeout(() => setSavedToast(false), 2500)
+      } catch (err) {
+        console.error('[ZAPIQ] Firebase save ERROR:', err)
+      }
+    }
+    if (zapiqScore > 0) save()
+    else console.log('[ZAPIQ] skipping save: zapiqScore is', zapiqScore, 'gameMode:', lastGameMode)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDismissCelebration = () => {

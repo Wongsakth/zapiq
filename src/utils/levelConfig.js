@@ -6,16 +6,13 @@ export const LEVEL_CONFIG = {
     name: 'Silver',
     label: 'Silver Crown',
     theme: {
-      primary: '#C0C0C0',
-      accent: '#F0F0F0',
+      primary: '#8878B0',
       bg: 'bg-silver-theme',
-      glow: 'glow-silver',
+      gradient: 'from-[#C8C4DC] to-[#A8A4C0]',
       shimmer: 'shimmer-silver',
       crownClass: 'crown-silver',
-      gradient: 'from-gray-400 to-gray-200',
-      buttonBg: 'bg-gray-600 hover:bg-gray-500',
-      cardBg: 'bg-gray-800/80',
-      border: 'border-gray-500/40',
+      accentBorder: 'border-[#D8D4EC]',
+      accentBg: 'bg-[#EAE7F5]',
     },
     tapColor: {
       colorCount: 4,
@@ -24,35 +21,33 @@ export const LEVEL_CONFIG = {
     },
     math: {
       operations: ['+'],
-      timeLimit: 30,
+      timeLimit: 10,
       wrongPenalty: 0,
       numRange: [1, 10],
     },
     memory: {
       pairs: 8,
-      timeLimit: 70,
+      timeLimit: 30,
       wrongPenalty: 0,
     },
     comboTarget: 25,
     upgradeThreshold: 0.80,
     nextLevel: 'gold',
-    upgradeScore: 20,
+    upgradeScore: 21,
+    bossUnlockScore: null,
   },
   gold: {
     id: 'gold',
     name: 'Gold',
     label: 'Gold Crown',
     theme: {
-      primary: '#FFD700',
-      accent: '#FFF176',
+      primary: '#C8A030',
       bg: 'bg-gold-theme',
-      glow: 'glow-gold',
+      gradient: 'from-[#D4B840] to-[#EDD890]',
       shimmer: 'shimmer-gold',
       crownClass: 'crown-gold',
-      gradient: 'from-yellow-400 to-amber-300',
-      buttonBg: 'bg-amber-700 hover:bg-amber-600',
-      cardBg: 'bg-amber-950/80',
-      border: 'border-yellow-500/40',
+      accentBorder: 'border-[#EDD890]',
+      accentBg: 'bg-[#FFF4D0]',
     },
     tapColor: {
       colorCount: 6,
@@ -61,35 +56,33 @@ export const LEVEL_CONFIG = {
     },
     math: {
       operations: ['+', '-', '×'],
-      timeLimit: 35,
+      timeLimit: 10,
       wrongPenalty: -1,
       numRange: [1, 20],
     },
     memory: {
       pairs: 10,
-      timeLimit: 90,
-      wrongPenalty: -1,
+      timeLimit: 35,
+      wrongPenalty: 0,
     },
     comboTarget: 30,
     upgradeThreshold: 0.90,
     nextLevel: 'diamond',
     upgradeScore: 27,
+    bossUnlockScore: null,
   },
   diamond: {
     id: 'diamond',
     name: 'Diamond',
     label: 'Diamond Crown',
     theme: {
-      primary: '#00BCD4',
-      accent: '#A855F7',
+      primary: '#4090C8',
       bg: 'bg-diamond-theme',
-      glow: 'glow-diamond',
+      gradient: 'from-[#80C0E8] to-[#A0B0F0]',
       shimmer: 'shimmer-diamond',
       crownClass: 'crown-diamond',
-      gradient: 'from-cyan-400 to-purple-400',
-      buttonBg: 'bg-cyan-900 hover:bg-cyan-800',
-      cardBg: 'bg-slate-900/80',
-      border: 'border-cyan-500/40',
+      accentBorder: 'border-[#B0C8E8]',
+      accentBg: 'bg-[#E0EFFA]',
     },
     tapColor: {
       colorCount: 6,
@@ -97,30 +90,69 @@ export const LEVEL_CONFIG = {
       wrongPenalty: -1,
     },
     math: {
-      operations: ['+', '-', '×', '÷'],
-      timeLimit: 28,
+      // pow = a^b, sqrt = √(perfect square) — handled in MathGame
+      operations: ['+', '-', '×', '÷', 'pow', 'sqrt'],
+      timeLimit: 8,
       wrongPenalty: -1,
       numRange: [1, 30],
     },
     memory: {
       pairs: 10,
-      timeLimit: 75,
-      wrongPenalty: -1,
+      timeLimit: 28,
+      wrongPenalty: 0,
     },
     comboTarget: null,
     upgradeThreshold: null,
     nextLevel: null,
     upgradeScore: null,
+    bossUnlockScore: 30,  // combo score threshold to unlock Boss Stage
+  },
+  boss: {
+    id: 'boss',
+    name: 'Boss',
+    label: 'Obsidian Crown',
+    theme: {
+      primary: '#6B3FA0',
+      bg: 'bg-boss-theme',
+      gradient: 'from-[#2D1B69] to-[#1A0A3A]',
+      shimmer: 'shimmer-obsidian',
+      crownClass: 'crown-obsidian',
+      accentBorder: 'border-[#4A2A7C]',
+      accentBg: 'bg-[#2D1B40]',
+    },
+    tapColor: {
+      colorCount: 6,
+      timeLimit: 10,
+      wrongPenalty: -1,
+      stroop: true,      // Stroop effect: tap by WORD not color
+    },
+    math: {
+      twoStep: true,     // 2-step equations
+      timeLimit: 10,
+      wrongPenalty: -1,
+    },
+    memory: {
+      pairs: 10,
+      timeLimit: 30,
+      wrongPenalty: -1,
+      flipBackDelay: 500,  // ultra-fast flip-back (normal = 900ms)
+    },
+    wrongLimit: 3,         // 3 consecutive wrongs = instant game over
+    comboTarget: null,
+    upgradeScore: null,
+    nextLevel: null,
+    bossUnlockScore: null,
   },
 }
 
+// Pastel game colors: bg hex, dark text hex, border hex
 export const GAME_COLORS = [
-  { name: 'Red',    bg: 'bg-red-500',    text: 'text-red-500',    hex: '#ef4444', border: 'border-red-400' },
-  { name: 'Blue',   bg: 'bg-blue-500',   text: 'text-blue-500',   hex: '#3b82f6', border: 'border-blue-400' },
-  { name: 'Green',  bg: 'bg-green-500',  text: 'text-green-500',  hex: '#22c55e', border: 'border-green-400' },
-  { name: 'Yellow', bg: 'bg-yellow-400', text: 'text-yellow-400', hex: '#facc15', border: 'border-yellow-300' },
-  { name: 'Purple', bg: 'bg-purple-500', text: 'text-purple-500', hex: '#a855f7', border: 'border-purple-400' },
-  { name: 'Orange', bg: 'bg-orange-500', text: 'text-orange-500', hex: '#f97316', border: 'border-orange-400' },
+  { name: 'Red',    bg: '#FFD0D0', textColor: '#8B2020', borderColor: '#F0AAAA' },
+  { name: 'Blue',   bg: '#C8DCFF', textColor: '#1A3D7A', borderColor: '#A8C4F0' },
+  { name: 'Green',  bg: '#C0ECCC', textColor: '#1A5A28', borderColor: '#A0D8B0' },
+  { name: 'Orange', bg: '#FFD8B0', textColor: '#7A3A10', borderColor: '#F0C090' },
+  { name: 'Purple', bg: '#E0C8FF', textColor: '#4A1A7A', borderColor: '#C8A8F0' },
+  { name: 'Pink',   bg: '#FFD0E8', textColor: '#8B1A4A', borderColor: '#F0AAC8' },
 ]
 
 export const MEMORY_EMOJIS = [
@@ -128,7 +160,7 @@ export const MEMORY_EMOJIS = [
 ]
 
 export const GAMES = [
-  { id: 'tapcolor', name: 'Tap Color', emoji: '🎨', desc: 'Tap the right color fast!' },
-  { id: 'math',     name: 'Math Blitz', emoji: '🧮', desc: 'Solve equations quickly!' },
+  { id: 'tapcolor', name: 'Tap Color',    emoji: '🎨', desc: 'Tap the right color fast!' },
+  { id: 'math',     name: 'Math Blitz',   emoji: '🧮', desc: 'Solve equations quickly!' },
   { id: 'memory',   name: 'Memory Match', emoji: '🧠', desc: 'Find all matching pairs!' },
 ]

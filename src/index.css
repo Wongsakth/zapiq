@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-text-primary: #2C2C2A;
+  --color-text-secondary: #9D9AA8;
+  --color-background-primary: #FAF8FF;
+  --color-accent-red: #E24B4A;
+}
+
 @layer base {
   * {
     -webkit-tap-highlight-color: transparent;
@@ -19,7 +26,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #0f0f1a;
+    background: #EDE8F5;
   }
 }
 
@@ -30,20 +37,20 @@
     min-height: 100dvh;
     position: relative;
     overflow: hidden;
-    background: #0f0f1a;
+    background: #FAF8FF;
     display: flex;
     flex-direction: column;
   }
 
-  /* Shimmer text effect */
+  /* ── Shimmer text — tuned for light background ── */
   .shimmer-silver {
     background: linear-gradient(
       90deg,
-      #c0c0c0 0%,
-      #f0f0f0 25%,
-      #e8e8e8 50%,
-      #f5f5f5 75%,
-      #c0c0c0 100%
+      #7870A0 0%,
+      #B0A8C8 30%,
+      #8880A8 60%,
+      #A098C0 80%,
+      #7870A0 100%
     );
     background-size: 300% auto;
     -webkit-background-clip: text;
@@ -55,11 +62,11 @@
   .shimmer-gold {
     background: linear-gradient(
       90deg,
-      #b8860b 0%,
-      #ffd700 25%,
-      #ffed4e 50%,
-      #ffd700 75%,
-      #b8860b 100%
+      #B07820 0%,
+      #D4A828 30%,
+      #C09830 60%,
+      #B89020 80%,
+      #B07820 100%
     );
     background-size: 300% auto;
     -webkit-background-clip: text;
@@ -71,12 +78,12 @@
   .shimmer-diamond {
     background: linear-gradient(
       90deg,
-      #00bcd4 0%,
-      #7c3aed 20%,
-      #06b6d4 40%,
-      #a855f7 60%,
-      #22d3ee 80%,
-      #00bcd4 100%
+      #0080A8 0%,
+      #6020C0 20%,
+      #0090B8 40%,
+      #7030B8 60%,
+      #10B0D0 80%,
+      #0080A8 100%
     );
     background-size: 300% auto;
     -webkit-background-clip: text;
@@ -85,31 +92,55 @@
     animation: shimmer 1.5s linear infinite;
   }
 
-  /* Crown SVG shimmer overlays */
-  .crown-silver { filter: drop-shadow(0 0 6px rgba(192,192,192,0.7)); }
-  .crown-gold { filter: drop-shadow(0 0 10px rgba(255,215,0,0.8)); animation: crownGlow 3s ease-in-out infinite; }
-  .crown-diamond { filter: drop-shadow(0 0 14px rgba(0,188,212,0.9)); animation: crownGlow 2s ease-in-out infinite; }
+  /* ── Crown SVG effects ── */
+  .crown-silver   { filter: drop-shadow(0 2px 8px rgba(100, 90, 150, 0.35)); }
+  .crown-gold     { filter: drop-shadow(0 0 10px rgba(200,160,30,0.7)); animation: crownGlowGold 3s ease-in-out infinite; }
+  .crown-diamond  { filter: drop-shadow(0 0 12px rgba(0,150,200,0.7));  animation: crownGlowDiamond 2s ease-in-out infinite; }
+  .crown-obsidian { filter: drop-shadow(0 0 12px rgba(100,50,200,0.8)); animation: crownGlowObsidian 2s ease-in-out infinite; }
 
-  /* Button styles */
-  .btn-primary {
-    @apply relative overflow-hidden px-8 py-4 rounded-2xl font-semibold text-lg
-           active:scale-95 transition-all duration-150 select-none;
+  /* ── Level backgrounds ── */
+  .bg-silver-theme  { background: #F2F0FA; }
+  .bg-gold-theme    { background: #FFFBEF; }
+  .bg-diamond-theme { background: #F0F6FF; }
+  .bg-boss-theme    { background: #1A1028; }
+
+  /* ── Obsidian shimmer (dark purple tones, visible on light bg) ── */
+  .shimmer-obsidian {
+    background: linear-gradient(
+      90deg,
+      #2D1B69 0%,
+      #6B3FA0 25%,
+      #1A0A3A 50%,
+      #8B5CF6 75%,
+      #2D1B69 100%
+    );
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 1.5s linear infinite;
   }
 
-  .btn-ghost {
-    @apply px-6 py-3 rounded-xl font-medium text-sm
-           active:scale-95 transition-all duration-150 select-none;
+  /* ── Common pastel card ── */
+  .pastel-card {
+    @apply bg-white rounded-2xl border border-[#E8E4F0];
   }
 
-  /* Card tap feedback */
-  .tap-card {
-    @apply active:scale-90 transition-transform duration-100 select-none cursor-pointer;
+  /* ── Primary action button ── */
+  .btn-pastel-green {
+    @apply bg-[#A8D5A2] text-[#1A4D1A] font-bold rounded-2xl
+           active:scale-95 transition-transform duration-150;
   }
 
-  /* Memory card flip styles */
-  .memory-scene {
-    perspective: 600px;
+  /* ── Back / close button ── */
+  .btn-back {
+    @apply w-10 h-10 rounded-full bg-white border border-[#E8E4F0]
+           flex items-center justify-center text-[#6B6878]
+           active:scale-90 transition-transform shadow-sm;
   }
+
+  /* ── Memory card flip ── */
+  .memory-scene { perspective: 600px; }
 
   .memory-card-inner {
     position: relative;
@@ -119,9 +150,7 @@
     transform-style: preserve-3d;
   }
 
-  .memory-card-inner.flipped {
-    transform: rotateY(180deg);
-  }
+  .memory-card-inner.flipped { transform: rotateY(180deg); }
 
   .memory-face {
     position: absolute;
@@ -134,71 +163,132 @@
     justify-content: center;
   }
 
-  .memory-face-back {
-    transform: rotateY(180deg);
-  }
+  .memory-face-back { transform: rotateY(180deg); }
 
-  /* Timer bar */
-  .timer-bar {
-    transition: width 1s linear, background-color 0.5s ease;
-  }
-
-  /* Correct/wrong flash */
-  .correct-flash {
-    animation: correctFlash 0.3s ease-out;
-  }
-
-  .wrong-flash {
-    animation: wrongFlash 0.3s ease-out;
-  }
-
-  /* Screen transition */
-  .screen-enter {
-    animation: slideUp 0.3s ease-out;
-  }
-
-  /* Gradient backgrounds per level */
-  .bg-silver-theme {
-    background: linear-gradient(160deg, #1e1e2e 0%, #2a2a3e 50%, #1a1a2e 100%);
-  }
-
-  .bg-gold-theme {
-    background: linear-gradient(160deg, #1a1200 0%, #2d1f00 50%, #1a1200 100%);
-  }
-
-  .bg-diamond-theme {
-    background: linear-gradient(160deg, #000d1a 0%, #001a2d 50%, #0d0020 100%);
-  }
-
-  /* Glow effects */
-  .glow-silver {
-    box-shadow: 0 0 20px rgba(192, 192, 192, 0.3), 0 0 60px rgba(192, 192, 192, 0.1);
-  }
-
-  .glow-gold {
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 60px rgba(255, 215, 0, 0.15);
-  }
-
-  .glow-diamond {
-    box-shadow: 0 0 20px rgba(0, 188, 212, 0.5), 0 0 60px rgba(124, 58, 237, 0.2);
-  }
+  /* ── Screen transition ── */
+  .screen-enter { animation: slideUp 0.3s ease-out; }
 }
 
-@keyframes correctFlash {
-  0% { background-color: rgba(34, 197, 94, 0.4); }
-  100% { background-color: transparent; }
+/* ── Keyframes ── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
 
-@keyframes wrongFlash {
-  0% { background-color: rgba(239, 68, 68, 0.4); }
-  100% { background-color: transparent; }
+@keyframes crownGlowGold {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(200,160,30,0.5)); }
+  50%       { filter: drop-shadow(0 0 20px rgba(200,160,30,0.9)); }
 }
 
-@keyframes crownGlow {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
-  50% { filter: drop-shadow(0 0 22px rgba(255,215,0,1)); }
+@keyframes crownGlowDiamond {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(0,150,200,0.6)); }
+  50%       { filter: drop-shadow(0 0 22px rgba(0,150,200,1)); }
 }
 
-/* Scrollbar hide */
+@keyframes crownGlowObsidian {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(100,50,200,0.6)); }
+  50%       { filter: drop-shadow(0 0 24px rgba(130,80,240,1)); }
+}
+
+@keyframes bounceIn {
+  0%   { transform: scale(0.8); opacity: 0; }
+  60%  { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes streakFire {
+  0%, 100% { transform: scale(1) rotate(-3deg); }
+  50%       { transform: scale(1.1) rotate(3deg); }
+}
+
+@keyframes levelUp {
+  0%   { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  70%  { transform: scale(1.15) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.8; transform: scale(0.97); }
+}
+
+/* ── Level-Up Celebration ──────────────────────────────────────── */
+@keyframes confetti-fall {
+  0%   { transform: translate(0, -20px) rotate(0deg);                       opacity: 1;  }
+  82%  {                                                                     opacity: 0.9; }
+  100% { transform: translate(var(--sway, 0px), 110vh) rotate(660deg);      opacity: 0;  }
+}
+
+@keyframes sparkle-burst {
+  0%   { transform: translate(0, 0) scale(1.3); opacity: 1; }
+  100% { transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(0); opacity: 0; }
+}
+
+@keyframes crown-bounce-in {
+  0%   { transform: scale(0)    rotate(-20deg); opacity: 0; }
+  52%  { transform: scale(1.28) rotate(7deg);   opacity: 1; }
+  70%  { transform: scale(0.9)  rotate(-3deg); }
+  84%  { transform: scale(1.07) rotate(1deg); }
+  100% { transform: scale(1)    rotate(0deg);   opacity: 1; }
+}
+
+@keyframes celebration-text-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer-ring-expand {
+  0%   { transform: scale(0.5); opacity: 0.85; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* ── Countdown overlay number pop ── */
+@keyframes countdownPop {
+  0%   { transform: scale(1.4); opacity: 0; }
+  22%  { transform: scale(1.0); opacity: 1; }
+  72%  { transform: scale(1.0); opacity: 1; }
+  100% { transform: scale(0.82); opacity: 0; }
+}
+.countdown-num {
+  animation: countdownPop var(--cd-dur, 800ms) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* ── Timer last-4s shake ── */
+@keyframes timerShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-3px); }
+  50%       { transform: translateX(3px); }
+  80%       { transform: translateX(-2px); }
+}
+.timer-shake { animation: timerShake 0.3s ease-in-out infinite; display: inline-block; }
+
+/* ── Boss button slow pulse ── */
+@keyframes pulseSlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(139,92,246,0.5); }
+  50%       { box-shadow: 0 0 0 12px rgba(139,92,246,0); }
+}
+.animate-pulse-slow { animation: pulseSlow 1.8s ease-in-out infinite; }
+
+/* ── Scrollbar hide ── */
 ::-webkit-scrollbar { display: none; }
 * { scrollbar-width: none; }

@@ -31,29 +31,29 @@ export default function PassPlaySetupScreen() {
       <div className="flex items-center gap-3 px-4 pt-5 pb-4">
         <button
           onClick={() => navigateTo('home')}
-          className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white active:scale-90 transition-transform"
+          className="w-10 h-10 rounded-full bg-white border border-[#E8E4F0] flex items-center justify-center text-[#6B6878] active:scale-90 transition-transform"
         >
           ‹
         </button>
         <div>
-          <h1 className="text-white font-bold text-xl">Pass & Play</h1>
-          <p className="text-white/40 text-xs">Take turns on the same device</p>
+          <h1 className="text-[#2C2C2A] font-bold text-xl">Pass & Play</h1>
+          <p className="text-[#9D9AA8] text-xs">Take turns on the same device</p>
         </div>
       </div>
 
       <div className="flex-1 px-4 overflow-y-auto">
-        <div className="bg-white/5 rounded-2xl p-4 mb-5 border border-white/10">
-          <p className="text-white/60 text-sm">
+        <div className="bg-white rounded-2xl p-4 mb-5 border border-[#E8E4F0]">
+          <p className="text-[#6B6878] text-sm">
             👥 2–4 players take turns playing all 3 games.<br />
             Highest total score wins!
           </p>
         </div>
 
-        <p className="text-white/40 text-xs uppercase tracking-wider mb-3">Players</p>
+        <p className="text-[#9D9AA8] text-xs uppercase tracking-wider mb-3">Players</p>
         <div className="flex flex-col gap-3 mb-4">
           {players.map((name, i) => (
             <div key={i} className="flex gap-2 items-center">
-              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-[#EAE7F5] flex items-center justify-center text-[#6B6878] text-sm font-bold flex-shrink-0">
                 {i + 1}
               </div>
               <input
@@ -63,16 +63,16 @@ export default function PassPlaySetupScreen() {
                 placeholder={`Player ${i + 1} name`}
                 maxLength={15}
                 className="
-                  flex-1 bg-white/10 border border-white/15 rounded-xl
-                  px-4 py-3 text-white text-sm font-medium
-                  placeholder-white/25 outline-none
-                  focus:border-white/40 transition-colors
+                  flex-1 bg-white border border-[#E8E4F0] rounded-xl
+                  px-4 py-3 text-[#2C2C2A] text-sm font-medium
+                  placeholder-[#9D9AA8] outline-none
+                  focus:border-[#A8D5A2] transition-colors
                 "
               />
               {players.length > 2 && (
                 <button
                   onClick={() => removePlayer(i)}
-                  className="w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center active:scale-90 transition-transform"
+                  className="w-8 h-8 rounded-full bg-red-100 text-red-400 flex items-center justify-center active:scale-90 transition-transform"
                 >
                   ✕
                 </button>
@@ -84,7 +84,7 @@ export default function PassPlaySetupScreen() {
         {players.length < 4 && (
           <button
             onClick={addPlayer}
-            className="w-full py-3 rounded-xl border border-dashed border-white/20 text-white/50 text-sm font-medium active:scale-95 transition-transform"
+            className="w-full py-3 rounded-xl border border-dashed border-[#D0CCDC] text-[#9D9AA8] text-sm font-medium active:scale-95 transition-transform"
           >
             + Add Player
           </button>
@@ -99,8 +99,8 @@ export default function PassPlaySetupScreen() {
             w-full py-4 rounded-2xl font-bold text-xl
             transition-all duration-150 active:scale-95
             ${canStart
-              ? `bg-gradient-to-r ${cfg.theme.gradient} text-black`
-              : 'bg-white/10 text-white/30 cursor-not-allowed'
+              ? 'bg-[#A8D5A2] text-[#1A4D1A]'
+              : 'bg-[#E8E4F0] text-[#9D9AA8] cursor-not-allowed'
             }
           `}
         >

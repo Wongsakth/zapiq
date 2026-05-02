@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { LEVEL_CONFIG } from '../utils/levelConfig'
 import Timer from '../components/ui/Timer'
+import { playSound } from '../utils/soundPlayer'
 
 function shuffle(arr) {
   const a = [...arr]
@@ -17,31 +18,45 @@ function randBetween(min, max) {
 
 const OP_SYMBOLS = { '+': '+', '-': '−', '×': '×', '÷': '÷' }
 
+// Fixed power pairs [base, exp, answer, displayStr]
+const POW_PAIRS = [
+  [2, 2, 4,  '2²'], [2, 3, 8,  '2³'], [2, 4, 16, '2⁴'],
+  [3, 2, 9,  '3²'], [3, 3, 27, '3³'],
+  [4, 2, 16, '4²'], [5, 2, 25, '5²'],
+  [6, 2, 36, '6²'], [7, 2, 49, '7²'],
+  [8, 2, 64, '8²'], [9, 2, 81, '9²'], [10, 2, 100, '10²'],
+]
+
+// Fixed sqrt pairs [radicand, answer]
+const SQRT_PAIRS = [
+  [4, 2], [9, 3], [16, 4], [25, 5],
+  [36, 6], [49, 7], [64, 8], [81, 9], [100, 10],
+]
+
 function generateEquation(operations, numRange) {
   const [min, max] = numRange
   const op = operations[Math.floor(Math.random() * operations.length)]
-  let a, b, answer
+  let a, b, answer, display
 
-  if (op === '+') {
-    a = randBetween(min, max)
-    b = randBetween(min, max)
-    answer = a + b
-  } else if (op === '-') {
-    a = randBetween(min + 1, max)
-    b = randBetween(min, a)
-    answer = a - b
-  } else if (op === '×') {
-    a = randBetween(1, Math.min(max, 12))
-    b = randBetween(1, Math.min(max, 12))
-    answer = a * b
+  if (op === 'pow') {
+    const pair = POW_PAIRS[Math.floor(Math.random() * POW_PAIRS.length)]
+    answer = pair[2]; display = pair[3]
+  } else if (op === 'sqrt') {
+    const pair = SQRT_PAIRS[Math.floor(Math.random() * SQRT_PAIRS.length)]
+    answer = pair[1]; display = `√${pair[0]}`
   } else {
-    // Division: generate clean divisions
-    b = randBetween(2, Math.min(max, 10))
-    answer = randBetween(1, Math.min(max, 10))
-    a = b * answer
+    if (op === '+') {
+      a = randBetween(min, max); b = randBetween(min, max); answer = a + b
+    } else if (op === '-') {
+      a = randBetween(min + 1, max); b = randBetween(min, a); answer = a - b
+    } else if (op === '×') {
+      a = randBetween(1, Math.min(max, 12)); b = randBetween(1, Math.min(max, 12)); answer = a * b
+    } else {
+      b = randBetween(2, Math.min(max, 10)); answer = randBetween(1, Math.min(max, 10)); a = b * answer
+    }
+    display = `${a} ${OP_SYMBOLS[op]} ${b}`
   }
 
-  // Generate wrong answers
   const wrongs = new Set()
   while (wrongs.size < 3) {
     const delta = randBetween(1, 8) * (Math.random() < 0.5 ? 1 : -1)
@@ -50,17 +65,22 @@ function generateEquation(operations, numRange) {
   }
 
   const choices = shuffle([answer, ...Array.from(wrongs)])
-  return { a, op, b, answer, choices, display: `${a} ${OP_SYMBOLS[op]} ${b}` }
+  return { answer, choices, display }
 }
 
-export default function MathGame({ crownLevel, onFinish, isDemo = false }) {
+export default function MathGame({ crownLevel, onFinish, isDemo = false, timerBonus = 0, enableTick = false }) {
   const config = LEVEL_CONFIG[crownLevel].math
-  const [score, setScore] = useState(0)
-  const [eq, setEq] = useState(null)
-  const [feedback, setFeedback] = useState(null)
-  const [expired, setExpired] = useState(false)
+  const [score, setScore]             = useState(0)
+  const [eq, setEq]                   = useState(null)
+  const [feedback, setFeedback]       = useState(null)
+  const [expired, setExpired]         = useState(false)
   const [solvedCount, setSolvedCount] = useState(0)
+  const [clearing, setClearing]       = useState(false)
   const feedbackTimer = useRef(null)
+  const wrongRef      = useRef(0)
+  const streakRef     = useRef(0)
+  const maxStreakRef  = useRef(0)
+  const solvedRef     = useRef(0)
 
   const next = useCallback(() => {
     setEq(generateEquation(config.operations, config.numRange))
@@ -69,84 +89,115 @@ export default function MathGame({ crownLevel, onFinish, isDemo = false }) {
   useEffect(() => { next() }, [next])
 
   const handleChoice = useCallback((choice) => {
-    if (expired || feedback || !eq) return
+    if (expired || feedback || clearing || !eq) return
     clearTimeout(feedbackTimer.current)
 
     const correct = choice === eq.answer
 
     if (correct) {
-      setScore(s => s + 2)
+      const newScore = score + 2
+      const newSolved = solvedCount + 1
+      setScore(newScore)
       setFeedback('correct')
-      setSolvedCount(c => c + 1)
-      if (isDemo && solvedCount + 1 >= 2) {
-        setTimeout(() => onFinish?.(score + 2), 600)
+      setSolvedCount(newSolved)
+      solvedRef.current = newSolved
+      streakRef.current += 1
+      if (streakRef.current > maxStreakRef.current) maxStreakRef.current = streakRef.current
+      playSound('ding')
+
+      if (isDemo && newSolved >= 2) {
+        setTimeout(() => onFinish?.(newScore), 600)
         return
       }
-    } else {
-      setScore(s => Math.max(0, s + config.wrongPenalty))
-      setFeedback('wrong')
-    }
 
-    feedbackTimer.current = setTimeout(() => {
-      setFeedback(null)
-      next()
-    }, 400)
-  }, [expired, feedback, eq, score, solvedCount, isDemo, config, next, onFinish])
+      feedbackTimer.current = setTimeout(() => {
+        setFeedback(null)
+        setClearing(true)
+        next()
+        requestAnimationFrame(() => requestAnimationFrame(() => setClearing(false)))
+      }, 280)
+    } else {
+      wrongRef.current += 1
+      streakRef.current = 0
+      if (config.wrongPenalty < 0) setScore(s => Math.max(0, s - 1))
+      setFeedback('wrong')
+      playSound('buzz')
+      feedbackTimer.current = setTimeout(() => {
+        setFeedback(null)
+        next()
+      }, 400)
+    }
+  }, [expired, feedback, clearing, eq, score, solvedCount, isDemo, config, next, onFinish])
 
   const handleExpire = useCallback(() => {
     setExpired(true)
     clearTimeout(feedbackTimer.current)
-    setTimeout(() => onFinish?.(score), 500)
+    playSound('gameOver')
+    setTimeout(() => onFinish?.(score, {
+      correct: solvedRef.current,
+      wrong: wrongRef.current,
+      maxStreak: maxStreakRef.current,
+    }), 500)
   }, [score, onFinish])
 
   if (!eq) return null
 
-  const bgFeedback =
-    feedback === 'correct' ? 'bg-green-500/15' :
-    feedback === 'wrong' ? 'bg-red-500/15' : 'bg-transparent'
+  const flashBg =
+    feedback === 'correct' ? 'bg-[#C0ECCC]/40'
+    : feedback === 'wrong'  ? 'bg-[#FFD0D0]/40'
+    : ''
+
+  const CHOICE_COLORS = [
+    { bg: '#E8F0FF', text: '#1A3D7A', border: '#C0CCEC' },
+    { bg: '#E8FFF0', text: '#1A5A28', border: '#B0DCBC' },
+    { bg: '#FFF0E8', text: '#7A3A10', border: '#E8C8A8' },
+    { bg: '#F4E8FF', text: '#4A1A7A', border: '#D0B8EC' },
+  ]
 
   return (
-    <div className={`flex flex-col h-full transition-colors duration-200 ${bgFeedback}`}>
+    <div className={`flex flex-col h-full transition-colors duration-200 ${flashBg}`}>
       <div className="px-4 pt-4 pb-2">
         {!isDemo && (
-          <Timer duration={config.timeLimit} onExpire={handleExpire} paused={expired} />
+          <Timer duration={config.timeLimit + timerBonus} onExpire={handleExpire} paused={expired} enableTick={enableTick} />
         )}
         <div className="flex justify-between items-center mt-3">
-          <span className="text-white/60 text-sm font-medium">Score</span>
-          <span className="text-white text-2xl font-bold tabular-nums">{score}</span>
+          <span className="text-[#9D9AA8] text-sm font-medium">Score</span>
+          <span className="text-[#2C2C2A] text-2xl font-bold tabular-nums">{score}</span>
         </div>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 gap-4">
-        {/* Equation display */}
-        <div className="bg-white/5 border border-white/10 rounded-3xl px-8 py-6 text-center w-full">
-          <p className="text-white/40 text-xs uppercase tracking-widest mb-2">Solve</p>
-          <p className="text-5xl font-bold text-white tabular-nums">{eq.display} = ?</p>
-        </div>
+        {!clearing && (
+          <>
+            <div className="bg-white border border-[#E8E4F0] rounded-3xl px-8 py-6 text-center w-full shadow-sm">
+              <p className="text-[#9D9AA8] text-xs uppercase tracking-widest mb-2">Solve</p>
+              <p className="text-5xl font-bold text-[#2C2C2A] tabular-nums">{eq.display} = ?</p>
+            </div>
 
-        {/* Feedback */}
-        <div className={`text-3xl transition-all duration-200 ${feedback ? 'opacity-100' : 'opacity-0'}`}>
-          {feedback === 'correct' ? '✅' : '❌'}
-        </div>
+            <div className={`text-3xl transition-opacity duration-200 ${feedback === 'correct' ? 'opacity-100' : 'opacity-0'}`}>
+              ✅
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Answer choices */}
-      <div className="p-4 grid grid-cols-2 gap-3 pb-6">
-        {eq.choices.map((choice) => (
-          <button
-            key={choice}
-            onClick={() => handleChoice(choice)}
-            className="
-              h-16 rounded-2xl font-bold text-2xl text-white
-              bg-white/10 border border-white/15
-              active:scale-90 transition-transform duration-100
-              hover:bg-white/15
-            "
-          >
-            {choice}
-          </button>
-        ))}
-      </div>
+      {!clearing && (
+        <div className="p-4 grid grid-cols-2 gap-3 pb-6">
+          {eq.choices.map((choice, i) => {
+            const c = CHOICE_COLORS[i % CHOICE_COLORS.length]
+            return (
+              <button
+                key={choice}
+                onClick={() => handleChoice(choice)}
+                className="h-16 rounded-2xl font-bold text-2xl border-2 active:scale-90 transition-transform duration-100 shadow-sm"
+                style={{ backgroundColor: c.bg, color: c.text, borderColor: c.border }}
+              >
+                {choice}
+              </button>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
